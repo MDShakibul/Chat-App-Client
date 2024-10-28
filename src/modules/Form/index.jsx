@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
+import { useNavigate } from 'react-router-dom';
 
 const Form = ({isSignInPage = true}) => {
+	const navigate= useNavigate()
 	const [data, setData] = useState({
 		...(!isSignInPage && {
 			fullName:''
@@ -15,7 +17,8 @@ const Form = ({isSignInPage = true}) => {
 
 	
 	return (
-		<div className="bg-white w-[600px] h-[800px] shadow-lg flex flex-col justify-center items-center">
+		<div className="bg-[#e1edff] h-screen flex justify-center items-center rounded">
+			<div className="bg-white w-[600px] h-[800px] shadow-lg flex flex-col justify-center items-center">
 			<div className="text-4xl font-extrabold ">
 				Welcome {isSignInPage && 'Back'}
 			</div>
@@ -67,10 +70,11 @@ const Form = ({isSignInPage = true}) => {
 			</form>
 			<div>
 				{isSignInPage ? "Didn't have an account" : 'Alredy have an account?'}{' '}
-				<span className="text-primary cursor-pointer underline">
+				<span className="text-primary cursor-pointer underline" onClick={()=>{navigate(`/users/${!isSignInPage ? 'sign_in' : 'sign_up'}`)}}>
 					{isSignInPage ? 'Sign up' : 'Sign in'}
 				</span>
 			</div>
+		</div>
 		</div>
 	);
 };
