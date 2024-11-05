@@ -34,11 +34,11 @@ import './App.css';
 import Dashboard from './modules/Dashboard';
 import Form from './modules/Form';
 
-const ProtectedRoute = ({ children }) => {
-	const isLoggedIn = localStorage?.getItem('user:token') !== null || true;
+const ProtectedRoute = ({ children, auth }) => {
+	const isLoggedIn = localStorage?.getItem('user:token') !== null || false;
 	const location = useLocation();
 
-	if (!isLoggedIn) {
+	if (!isLoggedIn && auth) {
 		return <Navigate to="/users/sign_in" replace />;
 	} else if (isLoggedIn && (location.pathname === '/users/sign_in' || location.pathname === '/users/sign_up')) {
 		return <Navigate to="/" />;
@@ -52,28 +52,31 @@ const routes = [
 		path: '/',
 		element: <Dashboard />,
 		protected: true,
+		auth:true
 	},
 	{
 		path: '/users/sign_in',
 		element: <Form isSignInPage={true} />,
 		protected: true,
+		auth:false
 	},
 	{
 		path: '/users/sign_up',
 		element: <Form isSignInPage={false} />,
 		protected: true,
+		auth:false
 	},
 ];
 
 export default function App() {
 	return (
 		<Routes>
-			{routes.map(({ path, element, protected: isProtected }, index) => (
+			{routes.map(({ path, element, auth, protected: isProtected }, index) => (
 				<Route
 					key={index}
 					path={path}
 					element={
-						isProtected ? <ProtectedRoute>{element}</ProtectedRoute> : element
+						isProtected ? <ProtectedRoute auth={auth}>{element}</ProtectedRoute> : element
 					}
 				/>
 			))}

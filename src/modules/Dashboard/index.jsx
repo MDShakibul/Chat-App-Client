@@ -1,4 +1,6 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unknown-property */
+import { useEffect, useState } from 'react';
 import Avater from '../../assets/avater.png';
 import Input from '../../components/Input';
 
@@ -41,6 +43,27 @@ function Dashboard() {
 			img: Avater,
 		},
 	];
+
+	const [user, setUser] = useState(JSON.parse(localStorage.getItem('user:detail')))
+	const [conversations, setConversations] = useState([]);
+
+	useEffect(()=>{
+		const loggedInUser = JSON.parse(localStorage.getItem('user:detail'))
+		const fetchConversations = async() =>{
+			const res = await fetch(`http://localhost:5000/api/conversations/${loggedInUser?.id}`,{
+				method: 'GET',
+				headers:{
+					'Content-Type':'application/json'
+				}
+			});
+
+			const resData = await res.json();
+			console.log(resData);
+			setConversations(resData)
+		}
+		fetchConversations();
+	},[])
+
 	return (
 		<div className="w-screen flex">
       <div className="w-[25%] h-screen border bg-secondary flex flex-col">
@@ -49,15 +72,15 @@ function Dashboard() {
       <img src={Avater} width={75} height={75} alt="Account Avatar" />
     </div>
     <div className="ml-8">
-      <h3 className="text-2xl">Account Name</h3>
+      <h3 className="text-2xl">{user?.fullName}</h3>
       <p className="text-lg font-light">My Account</p>
     </div>
   </div>
   <hr />
   <div className="mx-14 mt-10 flex-1 overflow-auto">
     <div className="text-primary text-lg">Messages</div>
-    {contacts?.map((contact, index) => {
-      const { name, status, img } = contact;
+    {conversations?.map((conversation, index) => {
+      const { conversationId, user } = conversation;
       return (
         <div
           key={index}
@@ -65,11 +88,11 @@ function Dashboard() {
         >
           <div className="cursor-pointer flex items-center">
             <div>
-              <img src={img} width={60} height={60} alt={name} />
+              <img src={Avater} width={60} height={60} alt='avator' />
             </div>
             <div className="ml-6">
-              <h3 className="text-lg font-semibold">{name}</h3>
-              <p className="text-sm font-light text-gray-400">{status}</p>
+              <h3 className="text-lg font-semibold">{user?.fullName}</h3>
+              <p className="text-sm font-light text-gray-400">{user?.email}</p>
             </div>
           </div>
         </div>

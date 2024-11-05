@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
-import { useNavigate } from 'react-router-dom';
+import { json, useNavigate } from 'react-router-dom';
 
 const Form = ({isSignInPage = true}) => {
 	const navigate= useNavigate()
@@ -14,6 +14,41 @@ const Form = ({isSignInPage = true}) => {
 		email: '',
 		password: '',
 	});
+
+	const handleSubmit = async(e) =>{
+		e.preventDefault();
+		
+
+		const res = await fetch(`http://localhost:5000/api/${isSignInPage ? 'login' : 'register'}`,{
+			method: 'POST',
+			headers:{
+				'Content-Type':'application/json'
+			},
+			body: JSON.stringify(data),
+		})
+		
+		/* console.log(resData); */
+
+		if(res.status === 400){
+			alert('Invalide credentials');
+		}else{
+			const resData = await res.json();
+			if(resData?.token){
+				localStorage.setItem('user:token', resData.token);
+				const userDetails = {
+					id: resData.user._id,
+					fullName: resData.user.fullName,
+					email: resData.user.email
+				  };
+				  
+				  localStorage.setItem('user:detail', JSON.stringify(userDetails));
+				navigate('/');
+			}
+		}
+		
+
+
+	}
 
 	
 	return (
@@ -29,7 +64,7 @@ const Form = ({isSignInPage = true}) => {
 					: 'Sign up to get started'}{' '}
 			</div>
 
-			<form className='w-full flex flex-col items-center' onSubmit={()=>console.log('clicked')}>
+			<form className='w-full flex flex-col items-center' onSubmit={handleSubmit}>
 
 			{!isSignInPage && (
 				<Input
